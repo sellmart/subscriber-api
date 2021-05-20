@@ -18,7 +18,7 @@ This will pull required images (i.e. maven & jdk-16) to build and run the servic
 ## Run
 Once the build is complete, you should see a message like `Successfully tagged subscriber-api:latest`, at this time
 you can run the service using the below command. Please remember, if you need to change the default NETFLIX URL, just update
-the value in the command below prior to executing `i.e. just replace the x values with your designed URL; NETFLIX_URL=xxxxxxxx`.
+the value in the command below prior to executing `i.e. just replace the x values with your desired domain; NETFLIX_URL=xxxxxxxx`.
 
 `docker run -it -p 8080:8080 -e "SPRING_PROFILES_ACTIVE=local" -e "NETFLIX_URL=nf-code-is-fun-1192605829.us-east-2.elb.amazonaws.com" subscriber-api`
 
