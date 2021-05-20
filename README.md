@@ -7,7 +7,7 @@ Additionally, provides business intelligence into the number of subscribers ente
 **This API is built with JDK 16, if you do not have JDK 16 on your local machine please follow 
 the next steps to build & run using docker.**
 * From your terminal window (Mac / Linux) or Docker CLI (for windows) navigate to the root of this project (i.e. subscriber-api/)
-* If you do not have Docker, please navigate [https://www.docker.com/get-started](here) to download and install it for your system.
+* If you do not have Docker, please navigate [here](https://www.docker.com/get-started) to download and install it for your system.
 * Once you have Docker installed (or if you already have Docker installed) please run the below command 
   in your terminal window (Mac/Linux) or if you are on Windows you can use the Docker CLI for Windows.
   
@@ -29,12 +29,12 @@ this indicates the service is ready and can be executed against.
 ## Build
 **If you already have JDK 16 on your machine OR if you would like to download and install it to run this service 
 please follow the below steps**
-* If you DO NOT have JDK 16, you can download it from [https://www.azul.com/downloads/?os=macos&architecture=arm-64-bit&package=jdk](here)
+* If you DO NOT have JDK 16, you can download it from [here](https://www.azul.com/downloads/?os=macos&architecture=arm-64-bit&package=jdk)
   if you are on an M1 Mac or if you are on Windows or non M1 Mac you can download the jdk 16 version from 
-  [https://www.oracle.com/java/technologies/javase-jdk16-downloads.html](here).
+  [here](https://www.oracle.com/java/technologies/javase-jdk16-downloads.html).
 * Once you have this version downloaded, please make sure you update your JAVA_HOME variable to the new version
 * Once the environment variable is updated, please make sure you have Maven v3 installed on your machine, if you don't
-  you can download and install it from [https://maven.apache.org/download.cgi](here).
+  you can download and install it from [here](https://maven.apache.org/download.cgi).
 * Lastly, please make sure you update your MAVEN_HOME environment variable to the new version (location) of the new install.
 * You can now navigate to the root folder of this project (i.e. subscriber-api/).
 * Once at the root of the project, please open your terminal (Mac/Linux) or command prompt (Windows) and 
@@ -81,5 +81,3 @@ VISA as the network, but a card number that starts with 6011, a validation rule 
 BAD REQUEST error as that is not a valid network/card number combination. 
 I know the instructions didn't directly specify this, but in the payment world that is a pretty standard check, and I know the 
 addPayment resource didn't perform the check because network isnt an available parameter. 
-
-
