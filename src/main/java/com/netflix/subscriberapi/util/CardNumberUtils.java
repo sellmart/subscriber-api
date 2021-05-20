@@ -7,6 +7,6 @@ public class CardNumberUtils {
         if (maskLen < 1) {
             return cardNumber;
         }
-        return "*".repeat(maskLen).format("%s", cardNumber.substring(maskLen));
+        return String.format("%s%s", "*".repeat(maskLen), cardNumber.substring(maskLen));
     }
 }
