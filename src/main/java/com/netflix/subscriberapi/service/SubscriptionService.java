@@ -20,6 +20,7 @@ import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.validator.routines.checkdigit.LuhnCheckDigit;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +34,7 @@ import javax.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 
 @Service
@@ -45,6 +47,7 @@ public class SubscriptionService {
     private final AvailableCardNetworksService cardNetworksService;
     private final AvailableCountriesService countriesService;
     private final PaymentMethodService paymentMethodService;
+    private final CreditCardNumberFormatRuleService ruleService;
     private final SubscriptionRepository subscriptionRepository;
     private final EntityManager entityManager;
 
@@ -57,7 +60,15 @@ public class SubscriptionService {
                     "One or more required fields are missing or invalid.");
         }
 
-        validateAllowedCardNetwork(request.getCardNetwork(), request.getCardNumber());
+        if (!LuhnCheckDigit.LUHN_CHECK_DIGIT.isValid(request.getCardNumber())) {
+            log.info("Luhn check digit failed for the provided CC number, " +
+                    "allowing to continue in case the addPayment resource performs a different check.");
+        }
+        if (!ruleService.cardNumberMatchCardNetwork(request.getCardNumber(), request.getCardNetwork())) {
+            throw new SubscriberApiException(HttpStatus.BAD_REQUEST,
+                    String.format("Card Network: %s does not match card number", request.getCardNetwork()));
+        }
+        validateAllowedCardNetwork(request.getCardNetwork());
         validateAllowedCountry(request.getCountry());
 
         if (!savedPaymentMethod(request)) {
@@ -69,7 +80,7 @@ public class SubscriptionService {
     }
 
     public StatsDto getSubscriptionCount(StatsFilter filter) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        var cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Long> countCriteria = cb.createQuery(Long.class);
         Root<Subscription> root = countCriteria.from(Subscription.class);
 
@@ -92,34 +103,31 @@ public class SubscriptionService {
                     "Error occurred attempting to retrieve available countries.");
         }
 
-        List<String> countries = availableCountryResponse.get().getCountries();
-        if (Objects.isNull(countries) || !countries.stream()
-                .anyMatch(availableCountry -> StringUtils.equalsIgnoreCase(availableCountry, country))) {
-            log.error("Country: {} does not match available country list {}",
-                    country, countries.toString()
-            );
+        AvailableCountriesDto dto = availableCountryResponse.getOrNull();
+        List<String> countries = Optional.ofNullable(dto).map(d -> d.getCountries()).orElse(new ArrayList<>());
+        if (countries.isEmpty() || countries.stream()
+                .noneMatch(availableCountry -> StringUtils.equalsIgnoreCase(availableCountry, country))) {
+            log.error("Country: {} does not match available country list {}", country, countries);
             throw new SubscriberApiException(HttpStatus.BAD_REQUEST,
                     "Unable to subscribe in requested country.");
         }
     }
 
-    private void validateAllowedCardNetwork(String cardNetwork, String cardNumber) {
+    private void validateAllowedCardNetwork(String cardNetwork) {
         Try<AllowedCardNetworksDto> allowedCardResponse = cardNetworksService.getAllowedCardNetworks();
         if (allowedCardResponse.isFailure()) {
             throw new SubscriberApiException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Error occurred attempting to retrieve available card networks.");
         }
-        List<String> cardNetworks = allowedCardResponse.get().getCardNetworks();
-        if (Objects.isNull(cardNetworks) || !cardNetworks.stream()
-                .anyMatch(availableNetwork -> StringUtils.equalsIgnoreCase(availableNetwork, cardNetwork))) {
-            log.error("Card network: {} does not match available network list {}",
-                    cardNetwork, cardNetworks.toString()
-            );
+
+        AllowedCardNetworksDto dto = allowedCardResponse.getOrNull();
+        List<String> cardNetworks = Optional.ofNullable(dto).map(d -> d.getCardNetworks()).orElse(new ArrayList<>());
+        if (Objects.isNull(cardNetworks) || cardNetworks.stream()
+                .noneMatch(availableNetwork -> StringUtils.equalsIgnoreCase(availableNetwork, cardNetwork))) {
+            log.error("Card network: {} does not match available network list {}", cardNetwork, cardNetworks);
             throw new SubscriberApiException(HttpStatus.BAD_REQUEST,
                     "Unable to subscribe with requested card network.");
         }
-
-        // TODO: validate card network matches card number
     }
 
     private boolean savedPaymentMethod(SubscriptionRequestDto request) {
