@@ -72,6 +72,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<groupId>commons-validator</groupId>
+			<artifactId>commons-validator</artifactId>
+			<version>1.7</version>
+		</dependency>
+		<dependency>
 			<groupId>org.junit.vintage</groupId>
 			<artifactId>junit-vintage-engine</artifactId>
 			<scope>test</scope>
@@ -123,13 +128,6 @@
 				<configuration>
 					<source>16</source>
 					<target>16</target>
-<!--					<annotationProcessorPaths>-->
-<!--						<path>-->
-<!--							<groupId>org.mapstruct</groupId>-->
-<!--							<artifactId>mapstruct-processor</artifactId>-->
-<!--							<version>${org.mapstruct.version}</version>-->
-<!--						</path>-->
-<!--					</annotationProcessorPaths>-->
 				</configuration>
 			</plugin>
 		</plugins>
