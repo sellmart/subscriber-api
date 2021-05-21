@@ -1,7 +1,7 @@
 package com.netflix.subscriberapi.service;
 
 import com.netflix.subscriberapi.model.CreditCardNumberFormatRule;
-import com.netflix.subscriberapi.repository.CreditCardNumberFormatRulesRepository;
+import com.netflix.subscriberapi.repository.CreditCardNumberFormatRuleRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,7 +19,7 @@ public class CreditCardNumberFormatRuleService {
     private static final String EQUALS_COMPARISON = "=";
     private static final String BEGINS_WITH_COMPARISON = "^";
 
-    private final CreditCardNumberFormatRulesRepository repository;
+    private final CreditCardNumberFormatRuleRepository repository;
 
     public boolean cardNumberMatchCardNetwork(String cardNumber, String cardNetwork) {
         CreditCardNumberFormatRule rule = repository.findFirstByCardNetwork(cardNetwork);
@@ -35,11 +35,17 @@ public class CreditCardNumberFormatRuleService {
     }
 
     private String[] extractRangeRuleParameterValues(String rangeRuleValue) {
+        if (StringUtils.isEmpty(rangeRuleValue)) {
+            return null;
+        }
         String commaDelimitedString = rangeRuleValue.replaceAll("\\[(.*?)\\]", "$1");
         return commaDelimitedString.split(",");
     }
 
     private boolean isIINRangeValid(String[] rules, String cardNumber) {
+        if (Objects.isNull(rules)) {
+            return true;
+        }
         return Arrays.stream(rules).anyMatch(rule -> {
             if (StringUtils.contains(rule, "-")) {
                 return checkSequenceRange(rule, cardNumber, BEGINS_WITH_COMPARISON);
@@ -49,6 +55,9 @@ public class CreditCardNumberFormatRuleService {
     }
 
     private boolean isValidLength(String[] rules, String cardNumber) {
+        if (Objects.isNull(rules)) {
+            return true;
+        }
         return Arrays.stream(rules).anyMatch(rule -> {
             if (StringUtils.contains(rule, "-")) {
                 return checkSequenceRange(rule, cardNumber, EQUALS_COMPARISON);

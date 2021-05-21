@@ -10,8 +10,8 @@ import com.netflix.subscriberapi.integration.dto.AddPaymentResponseDto;
 import com.netflix.subscriberapi.integration.dto.AllowedCardNetworksDto;
 import com.netflix.subscriberapi.integration.dto.AvailableCountriesDto;
 import com.netflix.subscriberapi.integration.dto.PaymentMethodRequestDto;
-import com.netflix.subscriberapi.integration.service.AvailableCardNetworksService;
-import com.netflix.subscriberapi.integration.service.AvailableCountriesService;
+import com.netflix.subscriberapi.integration.service.AvailableCardNetworkService;
+import com.netflix.subscriberapi.integration.service.AvailableCountryService;
 import com.netflix.subscriberapi.integration.service.PaymentMethodService;
 import com.netflix.subscriberapi.model.Subscription;
 import com.netflix.subscriberapi.repository.SubscriptionRepository;
@@ -44,8 +44,8 @@ import java.util.Optional;
 public class SubscriptionService {
     private static final SubscriptionMapper mapper = SubscriptionMapper.INSTANCE;
 
-    private final AvailableCardNetworksService cardNetworksService;
-    private final AvailableCountriesService countriesService;
+    private final AvailableCardNetworkService cardNetworksService;
+    private final AvailableCountryService countriesService;
     private final PaymentMethodService paymentMethodService;
     private final CreditCardNumberFormatRuleService ruleService;
     private final SubscriptionRepository subscriptionRepository;
@@ -60,14 +60,8 @@ public class SubscriptionService {
                     "One or more required fields are missing or invalid.");
         }
 
-        if (!LuhnCheckDigit.LUHN_CHECK_DIGIT.isValid(request.getCardNumber())) {
-            log.info("Luhn check digit failed for the provided CC number, " +
-                    "allowing to continue in case the addPayment resource performs a different check.");
-        }
-        if (!ruleService.cardNumberMatchCardNetwork(request.getCardNumber(), request.getCardNetwork())) {
-            throw new SubscriberApiException(HttpStatus.BAD_REQUEST,
-                    String.format("Card Network: %s does not match card number", request.getCardNetwork()));
-        }
+        performLuhnDigitCheck(request.getCardNumber()); // Will not fail if invalid, only here to log (see README)
+        validateCardNetworkAndNumberMatch(request.getCardNumber(), request.getCardNetwork());
         validateAllowedCardNetwork(request.getCardNetwork());
         validateAllowedCountry(request.getCountry());
 
@@ -94,6 +88,20 @@ public class SubscriptionService {
         Long count = queryCount.getSingleResult();
 
         return StatsDto.builder().count(count).build();
+    }
+
+    private void performLuhnDigitCheck(String cardNumber) {
+        if (!LuhnCheckDigit.LUHN_CHECK_DIGIT.isValid(cardNumber)) {
+            log.info("Luhn check digit failed for the provided CC number, " +
+                    "allowing to continue in case the addPayment resource performs a different check.");
+        }
+    }
+
+    private void validateCardNetworkAndNumberMatch(String cardNumber, String cardNetwork) {
+        if (!ruleService.cardNumberMatchCardNetwork(cardNumber, cardNetwork)) {
+            throw new SubscriberApiException(HttpStatus.BAD_REQUEST,
+                    String.format("Card Network: %s does not match card number", cardNetwork));
+        }
     }
 
     private void validateAllowedCountry(String country) {

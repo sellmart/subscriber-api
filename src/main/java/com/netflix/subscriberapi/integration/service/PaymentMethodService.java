@@ -15,13 +15,15 @@ import org.springframework.web.client.RestTemplate;
 @Slf4j
 @RequiredArgsConstructor
 public class PaymentMethodService {
+    private final RestTemplate restTemplate;
+
     @Value("${NETFLIX_URL}")
     private String host;
 
     public Try<AddPaymentResponseDto> addPaymentMethod(PaymentMethodRequestDto request) {
         String maskedCardNumber = CardNumberUtils.maskCardNumber(request.getCardNumber());
         String url = String.format("http://%s/api/v1/addPayment", host);
-        RestTemplate restTemplate = new RestTemplate();
+
         HttpEntity<PaymentMethodRequestDto> entity = new HttpEntity<>(request);
         return Try.of(() ->
                 restTemplate.postForObject(url, entity, AddPaymentResponseDto.class))

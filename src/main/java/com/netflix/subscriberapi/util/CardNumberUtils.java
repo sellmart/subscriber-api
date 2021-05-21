@@ -12,4 +12,3 @@ public class CardNumberUtils {
         return String.format("%s%s", "*".repeat(maskLen), cardNumber.substring(maskLen));
     }
 }
-
