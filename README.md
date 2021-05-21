@@ -67,10 +67,10 @@ credit card information. To stay somewhat true to those standards, anytime I sav
 and exchange for an OTP, then use that OTP with the other related data when exchanging because it is extremely sensitive.
 Lastly, when the PAN is exchanged for an OTP, the assumption is that it would be encrypted at rest (in storage).
 
-Another assumption made during implementation was regarding authentication and authorization. This was not discussed 
-in the instructions but as an Engineer it lives on the forefront of my mind. One can surmise that this service could be 
+Another assumption made during implementation was regarding authentication and authorization. This was not discussed
+in the instructions but as an Engineer it lives on the forefront of my mind. One can surmise that this service could be
 consumed by an internal team to the company. Depending on the consuming apps trust level, we can either implement implicit / Auth code
-grant auth flow (using an Auth server with this API acting as the resource server) or client credentials if the consuming 
+grant auth flow (using an Auth server with this API acting as the resource server) or client credentials if the consuming
 app has resides in a secure realm.
 
 Next, another assumption I made is regarding the Luhn check on the card number. The instructions states
@@ -79,11 +79,12 @@ it does not validate the card network, the only other validation that can be don
 sure on this (as it is just an assumption) however, I still wrote the Luhn validation logic, however, I do not halt the flow
 if the Luhn check fail, instead I log it, and allow the process to continue with the hope that the addPayment resource will
 fail the request if the Luhn check failed (I did this because I noticed the addPayment service failed some valid card numbers
-but passed others).
+but passed others). Additionally, I assumed the addPayment resource validates the card expiry year is a valid year
+( i.e. provided year >= current year ).
 
 Lastly, in addition to checking that the requested card network is available, I also performed a validation to check that the
 card network matched the card number that was provided in the request. For example, if a request is made with
 VISA as the network, but a card number that starts with 6011, a validation rule will fire and fail the request with a 400
 BAD REQUEST error as that is not a valid network/card number combination.
 I know the instructions didn't directly specify this, but in the payment world that is a pretty standard check, and I know the
-addPayment resource didn't perform the check because card network is not a constraint to this resource. 
+addPayment resource didn't perform the check because card network is not a constraint to this resource.
