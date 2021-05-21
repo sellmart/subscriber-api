@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 
 import java.util.Objects;
@@ -19,14 +20,14 @@ public class SubscriptionRequestDto {
     private String country;
 
     public boolean isValid() {
-        if ((Objects.isNull(twoDigitYear)
-                || Objects.isNull(cardNumber)
-                || Objects.isNull(cardNetwork)
-                || Objects.isNull(country))) {
+        if ((StringUtils.isEmpty(twoDigitYear)
+                || StringUtils.isEmpty(cardNumber)
+                || StringUtils.isEmpty(cardNetwork)
+                || StringUtils.isEmpty(country))) {
             return false;
         }
 
-        if (twoDigitYear.length() != 2 || country.length() != 2
+        if (StringUtils.length(twoDigitYear) != 2 || StringUtils.length(country) != 2
                 || !NumberUtils.isParsable(twoDigitYear)) {
             return false;
         }
