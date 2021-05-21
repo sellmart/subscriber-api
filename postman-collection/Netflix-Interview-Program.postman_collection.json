@@ -1,0 +1,70 @@
+{
+	"info": {
+		"_postman_id": "c96584aa-0b4a-46c7-98d4-0ce8db2a8b55",
+		"name": "Netflix-Interview-Program",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Subscription",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"twoDigitYear\": \"22\",\n    \"cardNumber\": \"4430440057770240\",\n    \"cardNetwork\": \"VISA\",\n    \"country\": \"US\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/subscribe",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"subscribe"
+					]
+				},
+				"description": "This resource will create a new subscription for the provided payment details."
+			},
+			"response": []
+		},
+		{
+			"name": "Get Subscriber Count",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/stats/subscribers",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"stats",
+						"subscribers"
+					],
+					"query": [
+						{
+							"key": "cardNetwork",
+							"value": "VISA",
+							"disabled": true
+						},
+						{
+							"key": "country",
+							"value": "PG",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
