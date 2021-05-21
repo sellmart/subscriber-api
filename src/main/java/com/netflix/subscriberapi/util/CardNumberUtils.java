@@ -1,5 +1,7 @@
 package com.netflix.subscriberapi.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class CardNumberUtils {
 
     public static String maskCardNumber(String cardNumber) {
@@ -10,3 +12,4 @@ public class CardNumberUtils {
         return String.format("%s%s", "*".repeat(maskLen), cardNumber.substring(maskLen));
     }
 }
+
