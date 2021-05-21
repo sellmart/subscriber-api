@@ -3,7 +3,7 @@ package com.netflix.subscriberapi.util;
 public class CardNumberUtils {
 
     public static String maskCardNumber(String cardNumber) {
-        int maskLen = cardNumber.length() - 4;
+        int maskLen = StringUtils.length(cardNumber) - 4;
         if (maskLen < 1) {
             return cardNumber;
         }
